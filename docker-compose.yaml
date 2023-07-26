@@ -1,0 +1,42 @@
+version: '3.9'
+
+## NOTE: use the script 'start-docker-compose' to run this 
+
+services:
+
+  mariadb-server:
+    image: mariadb:10.6.13
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: abcXYZ123$
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+      - mariadb-server-vol:/var/lib/mysql
+    networks:
+      - keycloak-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.1.1    
+    ports:
+      - 8181:8080
+    command: -v start-dev #--import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_DB: mariadb
+      KC_DB_URL_HOST: mariadb-server
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_URL_PORT: 3306
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: xyz123ABC$
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    networks:
+      - keycloak-network
+    depends_on:
+      - mariadb-server
+networks:
+  keycloak-network:
+
+volumes:
+  mariadb-server-vol:
