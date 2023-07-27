@@ -14,7 +14,18 @@ services:
       - mariadb-server-vol:/var/lib/mysql
     networks:
       - keycloak-network
-
+  phpMyAdmin:
+    image: phpmyadmin/phpmyadmin:5.2.1
+    depends_on:
+      - mariadb-server
+    environment:
+      PMA_HOST: mariadb-server
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    ports:
+      - 8180:80
+    networks:
+      - keycloak-network
   keycloak:
     image: quay.io/keycloak/keycloak:21.1.1    
     ports:
